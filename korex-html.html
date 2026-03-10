@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korex – Star Wars Unlimited</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#080c14;color:#e0eaf5;font-family:'Exo 2',sans-serif;min-height:100vh}
+  .root{min-height:100vh;background:#080c14;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,180,255,.06),transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(200,0,255,.04),transparent 60%)}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:rgba(8,12,20,.95);border-bottom:1px solid rgba(0,180,255,.18);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+  .logo{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;letter-spacing:6px;color:#00b4ff;text-shadow:0 0 20px rgba(0,180,255,.6);text-transform:uppercase}
+  .logo span{color:#c800ff;text-shadow:0 0 20px rgba(200,0,255,.6)}
+  .hright{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+  .ubadge{font-size:.82rem;color:#7aa8c4;font-family:'Rajdhani',sans-serif;letter-spacing:2px;text-transform:uppercase}
+  .sharebtn{display:flex;align-items:center;gap:.5rem;padding:.45rem 1rem;background:linear-gradient(135deg,rgba(0,180,255,.15),rgba(200,0,255,.15));border:1px solid rgba(0,180,255,.5);border-radius:6px;color:#00b4ff;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+  .sharebtn:hover{background:linear-gradient(135deg,rgba(0,180,255,.28),rgba(200,0,255,.22));border-color:rgba(0,180,255,.9);box-shadow:0 0 16px rgba(0,180,255,.3);color:#40cfff}
+  .main{max-width:1400px;margin:0 auto;padding:2rem}
+  .topbar{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap}
+  .swrap{position:relative;flex:1;min-width:200px}
+  .sinput{width:100%;padding:.7rem 1rem .7rem 2.8rem;background:rgba(13,22,38,.9);border:1px solid rgba(0,180,255,.2);border-radius:8px;color:#c8dff0;font-family:'Exo 2',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s,box-shadow .2s}
+  .sinput:focus{border-color:rgba(0,180,255,.6);box-shadow:0 0 12px rgba(0,180,255,.15)}
+  .sinput::placeholder{color:#3d5a72}
+  .sicon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:#3d6a88;pointer-events:none}
+  .addbtn{display:flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:linear-gradient(135deg,#00b4ff22,#00b4ff11);border:1px solid rgba(0,180,255,.4);border-radius:8px;color:#00b4ff;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap;text-transform:uppercase}
+  .addbtn:hover{background:linear-gradient(135deg,#00b4ff33,#00b4ff18);border-color:rgba(0,180,255,.8);box-shadow:0 0 16px rgba(0,180,255,.2)}
+  .statsbar{display:flex;gap:2rem;margin-bottom:1.5rem;padding:.8rem 1.2rem;background:rgba(13,22,38,.6);border:1px solid rgba(0,180,255,.1);border-radius:8px;flex-wrap:wrap}
+  .stat{display:flex;align-items:center;gap:.5rem;font-family:'Rajdhani',sans-serif;font-size:.9rem;letter-spacing:1px;color:#4d7a9a;text-transform:uppercase}
+  .statv{color:#00b4ff;font-weight:700;font-size:1rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:1.2rem}
+  .tile{position:relative;background:rgba(13,22,38,.85);border:1px solid rgba(0,180,255,.12);border-radius:12px;overflow:hidden;transition:all .25s;cursor:default}
+  .tile:hover{border-color:rgba(0,180,255,.5);box-shadow:0 0 24px rgba(0,180,255,.15),0 8px 32px rgba(0,0,0,.4);transform:translateY(-4px) scale(1.01)}
+  .imgwrap{position:relative;width:100%;aspect-ratio:.72;overflow:hidden;background:#0d1626}
+  .cimg{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+  .tile:hover .cimg{transform:scale(1.05)}
+  .imgph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem}
+  .overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(8,12,20,.95) 100%);opacity:0;transition:opacity .25s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.8rem;gap:.5rem}
+  .tile:hover .overlay{opacity:1}
+  .abtn{padding:.4rem .8rem;border-radius:5px;font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:all .15s;border:1px solid}
+  .ebtn{background:rgba(0,180,255,.15);border-color:rgba(0,180,255,.5);color:#00b4ff}
+  .ebtn:hover{background:rgba(0,180,255,.3)}
+  .dbtn{background:rgba(255,50,80,.12);border-color:rgba(255,50,80,.4);color:#ff4055}
+  .dbtn:hover{background:rgba(255,50,80,.25)}
+  .cinfo{padding:.6rem .7rem .7rem}
+  .cname{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;color:#b8d4e8;line-height:1.3;margin-bottom:.4rem}
+  .pbadge{display:inline-flex;align-items:center;padding:.2rem .55rem;background:linear-gradient(135deg,rgba(0,180,255,.18),rgba(0,100,200,.12));border:1px solid rgba(0,180,255,.35);border-radius:4px;color:#40cfff;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700}
+  .setbadge{display:inline-flex;align-items:center;padding:.15rem .4rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:3px;color:#4d7a9a;font-family:'Rajdhani',sans-serif;font-size:.7rem;letter-spacing:1px;margin-left:.3rem}
+  .empty{grid-column:1/-1;text-align:center;padding:5rem 2rem}
+  .eicon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+  .etitle{font-family:'Rajdhani',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#3d6a88;text-transform:uppercase;margin-bottom:.5rem}
+  .esub{font-size:.9rem;color:#2d4a60}
+  .backdrop{position:fixed;inset:0;background:rgba(4,8,16,.88);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+  .modal{background:linear-gradient(145deg,#0d1626,#0a1220);border:1px solid rgba(0,180,255,.25);border-radius:14px;padding:1.8rem;width:100%;max-width:480px;box-shadow:0 0 60px rgba(0,0,0,.6)}
+  .mtitle{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00b4ff;margin-bottom:1.5rem;padding-bottom:.8rem;border-bottom:1px solid rgba(0,180,255,.15)}
+  .flabel{display:block;font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#4d7a9a;margin-bottom:.4rem}
+  .fgroup{margin-bottom:1.2rem}
+  .acwrap{position:relative}
+  .finput{width:100%;padding:.7rem 1rem;background:rgba(8,14,24,.9);border:1px solid rgba(0,180,255,.2);border-radius:7px;color:#c8dff0;font-family:'Exo 2',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s}
+  .finput:focus{border-color:rgba(0,180,255,.55);box-shadow:0 0 12px rgba(0,180,255,.12)}
+  .finput::placeholder{color:#2d4a60}
+  .finput:disabled{opacity:.4;cursor:not-allowed}
+  .aclist{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0a1220;border:1px solid rgba(0,180,255,.25);border-radius:8px;z-index:300;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.6);max-height:320px;overflow-y:auto}
+  .acitem{display:flex;align-items:center;gap:.8rem;padding:.6rem .9rem;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(0,180,255,.06)}
+  .acitem:last-child{border-bottom:none}
+  .acitem:hover{background:rgba(0,180,255,.1)}
+  .acname{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:600;color:#c8dff0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .acsub{font-size:.72rem;color:#3d6a88;margin-top:2px}
+  .acstatus{padding:.9rem 1rem;text-align:center;color:#3d6a88;font-size:.83rem;font-family:'Rajdhani',sans-serif;letter-spacing:1px}
+  .selpreview{display:flex;align-items:center;gap:.9rem;padding:.8rem;background:rgba(0,180,255,.06);border:1px solid rgba(0,180,255,.2);border-radius:8px;margin-bottom:1rem}
+  .selthumb{width:52px;height:72px;border-radius:5px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,180,255,.2);background:#0d1626}
+  .selthumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .selname{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;color:#b8d4e8}
+  .selsub{font-size:.75rem;color:#4d7a9a;margin-top:2px}
+  .selid{font-size:.68rem;color:#2d4060;margin-top:3px;font-family:monospace}
+  .piwrap{position:relative}
+  .pisym{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:#00b4ff;font-family:'Rajdhani',sans-serif;font-weight:700;pointer-events:none}
+  .piwrap .finput{padding-left:1.8rem}
+  .mactions{display:flex;gap:.8rem;margin-top:1.5rem;justify-content:flex-end}
+  .bcancl{padding:.6rem 1.4rem;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#4d7a9a;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:1px;cursor:pointer;text-transform:uppercase}
+  .bcancl:hover{border-color:rgba(255,255,255,.25);color:#7aa8c4}
+  .bconf{padding:.6rem 1.6rem;background:linear-gradient(135deg,rgba(0,180,255,.2),rgba(0,100,200,.2));border:1px solid rgba(0,180,255,.55);border-radius:7px;color:#00b4ff;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+  .bconf:hover:not([disabled]){background:linear-gradient(135deg,rgba(0,180,255,.35),rgba(0,100,200,.3));box-shadow:0 0 16px rgba(0,180,255,.25);color:#50d4ff}
+  .bconf[disabled]{opacity:.35;cursor:not-allowed}
+  .slinkbox{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;background:rgba(8,14,24,.9);border:1px solid rgba(0,180,255,.25);border-radius:8px;margin:1rem 0}
+  .slinktext{flex:1;font-family:'Rajdhani',sans-serif;font-size:.95rem;color:#40cfff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .copybtn{padding:.35rem .9rem;background:rgba(0,180,255,.15);border:1px solid rgba(0,180,255,.4);border-radius:5px;color:#00b4ff;font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;cursor:pointer;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+  .copybtn.cp{color:#00ff88;border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.1)}
+  .snote{font-size:.82rem;color:#3d5a72;line-height:1.5}
+  .vbadge{display:flex;align-items:center;gap:.5rem;padding:.35rem .9rem;background:rgba(200,0,255,.1);border:1px solid rgba(200,0,255,.3);border-radius:20px;color:#c800ff;font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+  .dot{width:6px;height:6px;border-radius:50%;background:#c800ff;animation:pulse 2s infinite}
+  .scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,180,255,.5),transparent);pointer-events:none;animation:scan 8s linear infinite;opacity:.4;z-index:999}
+  .ctlt,.ctrt{position:fixed;width:40px;height:40px;pointer-events:none;opacity:.5;z-index:50}
+  .ctlt{top:0;left:0;border-top:2px solid #00b4ff;border-left:2px solid #00b4ff}
+  .ctrt{top:0;right:0;border-top:2px solid #00b4ff;border-right:2px solid #00b4ff}
+  .toast{position:fixed;bottom:2rem;right:2rem;padding:.8rem 1.4rem;background:rgba(10,18,32,.95);border:1px solid rgba(0,255,136,.4);border-radius:8px;color:#00ff88;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:1px;z-index:9999;box-shadow:0 0 20px rgba(0,255,136,.15);animation:fiu .3s ease,fout .4s 2.6s forwards}
+  @keyframes scan{0%{top:0}100%{top:100%}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  @keyframes fiu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fout{to{opacity:0;transform:translateY(10px)}}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:#080c14}
+  ::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:3px}
+  @media(max-width:600px){
+    .header{padding:0 1rem}
+    .main{padding:1rem}
+    .ubadge{display:none}
+    .logo{font-size:1.4rem;letter-spacing:3px}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const { useState, useRef, useEffect, useCallback } = React;
+
+const USERNAME = "darthtrader";
+const SHARE_BASE = "korex.ar/u/";
+const SET_NAMES = { SOR:"Spark of Rebellion", SHD:"Shadows of the Galaxy", TWI:"Twilight of the Republic", JTL:"Jump to Lightspeed", LOF:"Legends of the Force" };
+const SET_COLORS = { SOR:"#c80000", SHD:"#8800cc", TWI:"#006acc", JTL:"#cc6600", LOF:"#008866" };
+
+// Image: cdn.swu-db.com — works in real browsers, not in Claude sandbox
+const cardImg = (set, num) => `https://cdn.swu-db.com/images/cards/${set}/${String(num).padStart(3,"0")}.png`;
+
+const CATALOG = [
+  { id:"SOR_001", s:"SOR", n:1,   name:"Director Krennic",     sub:"Aspiring to Authority",          t:"Leader" },
+  { id:"SOR_002", s:"SOR", n:2,   name:"Iden Versio",          sub:"Inferno Squad Commander",         t:"Leader" },
+  { id:"SOR_003", s:"SOR", n:3,   name:"Chewbacca",            sub:"Walking Carpet",                  t:"Leader" },
+  { id:"SOR_004", s:"SOR", n:4,   name:"Chirrut Îmwe",         sub:"One With The Force",              t:"Leader" },
+  { id:"SOR_005", s:"SOR", n:5,   name:"Luke Skywalker",       sub:"Faithful Friend",                 t:"Leader" },
+  { id:"SOR_006", s:"SOR", n:6,   name:"Emperor Palpatine",    sub:"Galactic Ruler",                  t:"Leader" },
+  { id:"SOR_007", s:"SOR", n:7,   name:"Grand Moff Tarkin",    sub:"Oversector Governor",             t:"Leader" },
+  { id:"SOR_008", s:"SOR", n:8,   name:"Hera Syndulla",        sub:"Spectre Two",                     t:"Leader" },
+  { id:"SOR_009", s:"SOR", n:9,   name:"Leia Organa",          sub:"Alliance General",                t:"Leader" },
+  { id:"SOR_010", s:"SOR", n:10,  name:"Darth Vader",          sub:"Dark Lord of the Sith",           t:"Leader" },
+  { id:"SOR_011", s:"SOR", n:11,  name:"Grand Inquisitor",     sub:"Hunting the Jedi",                t:"Leader" },
+  { id:"SOR_012", s:"SOR", n:12,  name:"IG-88",                sub:"Ruthless Bounty Hunter",          t:"Leader" },
+  { id:"SOR_013", s:"SOR", n:13,  name:"Cassian Andor",        sub:"Dedicated to the Rebellion",      t:"Leader" },
+  { id:"SOR_014", s:"SOR", n:14,  name:"Sabine Wren",          sub:"Galvanized Revolutionary",        t:"Leader" },
+  { id:"SOR_015", s:"SOR", n:15,  name:"Boba Fett",            sub:"Collecting the Bounty",           t:"Leader" },
+  { id:"SOR_016", s:"SOR", n:16,  name:"Grand Admiral Thrawn", sub:"Patient and Insightful",          t:"Leader" },
+  { id:"SOR_017", s:"SOR", n:17,  name:"Han Solo",             sub:"Audacious Smuggler",              t:"Leader" },
+  { id:"SOR_018", s:"SOR", n:18,  name:"Jyn Erso",             sub:"Resisting Oppression",            t:"Leader" },
+  { id:"SOR_049", s:"SOR", n:49,  name:"Luke Skywalker",       sub:"Jedi Knight",                     t:"Unit" },
+  { id:"SOR_050", s:"SOR", n:50,  name:"Leia Organa",          sub:"Defiant Princess",                t:"Unit" },
+  { id:"SOR_051", s:"SOR", n:51,  name:"Han Solo",             sub:"Reluctant Hero",                  t:"Unit" },
+  { id:"SOR_052", s:"SOR", n:52,  name:"Chewbacca",            sub:"Loyal Companion",                 t:"Unit" },
+  { id:"SOR_053", s:"SOR", n:53,  name:"R2-D2",                sub:"Ignoring Protocol",               t:"Unit" },
+  { id:"SOR_054", s:"SOR", n:54,  name:"C-3PO",                sub:"Protocol Droid",                  t:"Unit" },
+  { id:"SOR_055", s:"SOR", n:55,  name:"Obi-Wan Kenobi",       sub:"Following Fate",                  t:"Unit" },
+  { id:"SOR_056", s:"SOR", n:56,  name:"Yoda",                 sub:"Old Master",                      t:"Unit" },
+  { id:"SOR_083", s:"SOR", n:83,  name:"Darth Vader",          sub:"Commanding the First Legion",     t:"Unit" },
+  { id:"SOR_084", s:"SOR", n:84,  name:"Emperor Palpatine",    sub:"Master of the Dark Side",         t:"Unit" },
+  { id:"SOR_085", s:"SOR", n:85,  name:"Boba Fett",            sub:"Notorious Bounty Hunter",         t:"Unit" },
+  { id:"SOR_086", s:"SOR", n:86,  name:"Stormtrooper",         sub:null,                              t:"Unit" },
+  { id:"SOR_102", s:"SOR", n:102, name:"Millennium Falcon",    sub:"Piece of Junk",                   t:"Unit" },
+  { id:"SHD_001", s:"SHD", n:1,   name:"Ahsoka Tano",          sub:"Brash Maverick",                  t:"Leader" },
+  { id:"SHD_002", s:"SHD", n:2,   name:"Cal Kestis",           sub:"Hermit's Apprentice",             t:"Leader" },
+  { id:"SHD_003", s:"SHD", n:3,   name:"Ezra Bridger",         sub:"Resourceful Freedom Fighter",     t:"Leader" },
+  { id:"SHD_007", s:"SHD", n:7,   name:"Darth Maul",           sub:"Lethal Surprise",                 t:"Leader" },
+  { id:"SHD_009", s:"SHD", n:9,   name:"Jabba the Hutt",       sub:"His High Exaltedness",            t:"Leader" },
+  { id:"SHD_010", s:"SHD", n:10,  name:"Kylo Ren",             sub:"Tormented One",                   t:"Leader" },
+  { id:"SHD_053", s:"SHD", n:53,  name:"Ahsoka Tano",          sub:"Fulcrum",                         t:"Unit" },
+  { id:"SHD_079", s:"SHD", n:79,  name:"Darth Maul",           sub:"Fired by Hatred",                 t:"Unit" },
+  { id:"SHD_080", s:"SHD", n:80,  name:"Kylo Ren",             sub:"Rash and Deadly",                 t:"Unit" },
+  { id:"TWI_003", s:"TWI", n:3,   name:"Obi-Wan Kenobi",       sub:"Patient Mentor",                  t:"Leader" },
+  { id:"TWI_004", s:"TWI", n:4,   name:"Yoda",                 sub:"Sensing Darkness",                t:"Leader" },
+  { id:"TWI_005", s:"TWI", n:5,   name:"Count Dooku",          sub:"Face of the Confederacy",         t:"Leader" },
+  { id:"TWI_009", s:"TWI", n:9,   name:"Maul",                 sub:"A Rival in Darkness",             t:"Leader" },
+  { id:"TWI_010", s:"TWI", n:10,  name:"Ahsoka Tano",          sub:"Snips",                           t:"Leader" },
+  { id:"TWI_011", s:"TWI", n:11,  name:"Anakin Skywalker",     sub:"What it Takes to Win",            t:"Leader" },
+  { id:"TWI_012", s:"TWI", n:12,  name:"Mace Windu",           sub:"Vapaad Form Master",              t:"Leader" },
+  { id:"TWI_014", s:"TWI", n:14,  name:"Chancellor Palpatine", sub:"Playing Both Sides",              t:"Leader" },
+  { id:"TWI_143", s:"TWI", n:143, name:"Anakin Skywalker",     sub:"Maverick Mentor",                 t:"Unit" },
+  { id:"TWI_147", s:"TWI", n:147, name:"Yoda",                 sub:"Enduring Grand Master",           t:"Unit" },
+  { id:"TWI_148", s:"TWI", n:148, name:"General Grievous",     sub:"Daunting Cyborg",                 t:"Unit" },
+  { id:"TWI_151", s:"TWI", n:151, name:"Padmé Amidala",        sub:"Resolute Senator",                t:"Unit" },
+  { id:"JTL_001", s:"JTL", n:1,   name:"Wedge Antilles",       sub:"Red Leader",                      t:"Leader" },
+  { id:"JTL_002", s:"JTL", n:2,   name:"Poe Dameron",          sub:"Most Daring Pilot",               t:"Leader" },
+  { id:"JTL_004", s:"JTL", n:4,   name:"Luke Skywalker",       sub:"Red Five",                        t:"Leader" },
+  { id:"JTL_009", s:"JTL", n:9,   name:"Darth Vader",          sub:"Terror to Behold",                t:"Leader" },
+  { id:"LOF_001", s:"LOF", n:1,   name:"Qui-Gon Jinn",         sub:"Following the Will of the Force", t:"Leader" },
+  { id:"LOF_002", s:"LOF", n:2,   name:"Rey",                  sub:"Unimaginable Power",              t:"Leader" },
+  { id:"LOF_009", s:"LOF", n:9,   name:"Darth Maul",           sub:"Shattered by Defeat",             t:"Leader" },
+  { id:"LOF_070", s:"LOF", n:70,  name:"Anakin Skywalker",     sub:"Conflicted Apprentice",           t:"Unit" },
+  { id:"LOF_071", s:"LOF", n:71,  name:"Obi-Wan Kenobi",       sub:"Destined to Fall",                t:"Unit" },
+  { id:"LOF_073", s:"LOF", n:73,  name:"Rey",                  sub:"Seeking Answers",                 t:"Unit" },
+  { id:"LOF_074", s:"LOF", n:74,  name:"Darth Maul",           sub:"Apprentice of Darkness",          t:"Unit" },
+].map(c => ({
+  ...c,
+  displayName: c.sub ? `${c.name} – ${c.sub}` : c.name,
+  setName: SET_NAMES[c.s],
+  imageUrl: cardImg(c.s, c.n),
+}));
+
+function searchCatalog(q) {
+  const t = q.toLowerCase().trim();
+  return CATALOG.filter(c =>
+    c.name.toLowerCase().includes(t) || (c.sub && c.sub.toLowerCase().includes(t))
+  ).slice(0, 12);
+}
+
+function Placeholder({ name, set }) {
+  const initials = (name||"").split(" ").filter(w => /^[A-Z\u00C0-\u024F]/.test(w)).map(w=>w[0]).join("").slice(0,3);
+  const color = SET_COLORS[set] || "#1a3a50";
+  return React.createElement("div", {
+    style:{width:"100%",height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"0.5rem",background:`linear-gradient(160deg,${color}33,#0a1220)`}
+  },
+    React.createElement("div", {style:{fontSize:"2rem",fontFamily:"Rajdhani,sans-serif",fontWeight:700,color:`${color}bb`,letterSpacing:"2px"}}, initials||"◈"),
+    React.createElement("div", {style:{fontSize:"0.55rem",fontFamily:"Rajdhani,sans-serif",color:`${color}77`,letterSpacing:"3px",textTransform:"uppercase"}}, set)
+  );
+}
+
+function CardImg({ url, name, set }) {
+  const [ok, setOk] = useState(false);
+  const [err, setErr] = useState(false);
+  return React.createElement("div", {style:{width:"100%",height:"100%",position:"relative"}},
+    !ok && React.createElement(Placeholder, {name, set}),
+    !err && React.createElement("img", {
+      src: url, alt: name,
+      className: "cimg",
+      style:{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:ok?"block":"none"},
+      onLoad: () => setOk(true),
+      onError: () => setErr(true)
+    })
+  );
+}
+
+function AcThumb({ url, name, set }) {
+  const [ok, setOk] = useState(false);
+  const [err, setErr] = useState(false);
+  const color = SET_COLORS[set] || "#1a3a50";
+  const initials = (name||"").split(" ").filter(w=>/^[A-Z]/.test(w)).map(w=>w[0]).join("").slice(0,2);
+  return React.createElement("div", {
+    style:{width:36,height:50,flexShrink:0,borderRadius:4,overflow:"hidden",border:"1px solid rgba(0,180,255,.15)",background:`linear-gradient(160deg,${color}44,#0d1626)`,display:"flex",alignItems:"center",justifyContent:"center",color:`${color}cc`,fontSize:".72rem",fontFamily:"Rajdhani,sans-serif",fontWeight:700,position:"relative"}
+  },
+    !ok && React.createElement("span", null, err ? initials : initials),
+    !err && React.createElement("img", {
+      src: url, alt: name,
+      style:{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:ok?"block":"none"},
+      onLoad: ()=>setOk(true), onError: ()=>setErr(true)
+    })
+  );
+}
+
+function App() {
+  const [viewMode, setViewMode] = useState("owner");
+  const [collection, setCollection] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("korex_collection") || "[]"); } catch { return []; }
+  });
+  const [filterQ, setFilterQ] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [editCard, setEditCard] = useState(null);
+  const [cardQ, setCardQ] = useState("");
+  const [acList, setAcList] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [price, setPrice] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState(null);
+  const acRef = useRef(null);
+
+  useEffect(() => {
+    try { localStorage.setItem("korex_collection", JSON.stringify(collection)); } catch {}
+  }, [collection]);
+
+  useEffect(() => {
+    const h = e => { if (acRef.current && !acRef.current.contains(e.target)) setAcList([]); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const handleCardQ = v => {
+    setCardQ(v); setSelected(null);
+    setAcList(v.trim().length >= 2 ? searchCatalog(v) : []);
+  };
+  const selectCard = c => { setSelected(c); setCardQ(c.displayName); setAcList([]); };
+
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 3100); };
+
+  const addCard = () => {
+    if (!selected || !price) return;
+    const entry = { uid: Date.now().toString(), card_id: selected.id, name: selected.displayName, setCode: selected.s, type: selected.t, imageUrl: selected.imageUrl, price: parseFloat(price).toFixed(2) };
+    setCollection(p => [entry, ...p]);
+    setShowAdd(false); setSelected(null); setCardQ(""); setPrice(""); setAcList([]);
+    showToast("✦ Carta agregada");
+  };
+
+  const removeCard = uid => { setCollection(p => p.filter(c => c.uid !== uid)); showToast("Carta eliminada"); };
+  const openEdit = c => { setEditCard(c); setEditPrice(c.price); };
+  const saveEdit = () => {
+    setCollection(p => p.map(c => c.uid === editCard.uid ? {...c, price: parseFloat(editPrice).toFixed(2)} : c));
+    setEditCard(null); showToast("Precio actualizado");
+  };
+  const copyLink = () => {
+    const link = `${SHARE_BASE}${USERNAME}`;
+    navigator.clipboard?.writeText("https://" + link).catch(()=>{});
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+    showToast("¡Enlace copiado!");
+  };
+
+  const filtered = collection.filter(c => c.name.toLowerCase().includes(filterQ.toLowerCase()));
+  const totalValue = collection.reduce((s, c) => s + parseFloat(c.price || 0), 0);
+  const shareLink = `${SHARE_BASE}${USERNAME}`;
+
+  const h = React.createElement;
+
+  return h("div", {className:"root"},
+    h("div", {className:"scanline"}),
+    h("div", {className:"ctlt"}), h("div", {className:"ctrt"}),
+
+    // HEADER
+    h("header", {className:"header"},
+      h("div", {className:"logo"}, "KOR", h("span", null, "EX")),
+      h("div", {className:"hright"},
+        viewMode === "viewer"
+          ? h(React.Fragment, null,
+              h("div", {className:"vbadge"}, h("div",{className:"dot"}), " Vista pública"),
+              h("button", {className:"addbtn", style:{fontSize:".8rem",padding:".35rem .9rem"}, onClick:()=>setViewMode("owner")}, "← Volver")
+            )
+          : h(React.Fragment, null,
+              h("span", {className:"ubadge"}, "⬡ " + USERNAME),
+              h("button", {className:"sharebtn", onClick:()=>setShowShare(true)}, "⟁ Compartir Carpeta"),
+              h("button", {className:"vbadge", style:{cursor:"pointer",background:"none"}, onClick:()=>setViewMode("viewer")}, "👁 Vista pública")
+            )
+      )
+    ),
+
+    // MAIN
+    h("main", {className:"main"},
+      h("div", {className:"topbar"},
+        h("div", {className:"swrap"},
+          h("span", {className:"sicon"}, "⌕"),
+          h("input", {className:"sinput", placeholder:"Buscar en mi carpeta...", value:filterQ, onChange:e=>setFilterQ(e.target.value)})
+        ),
+        viewMode === "owner" && h("button", {className:"addbtn", onClick:()=>setShowAdd(true)}, "+ Agregar Carta")
+      ),
+
+      h("div", {className:"statsbar"},
+        h("div", {className:"stat"}, "Cartas ", h("span",{className:"statv"}, collection.length)),
+        h("div", {className:"stat"}, "Valor total ", h("span",{className:"statv"}, "$" + totalValue.toFixed(2))),
+        h("div", {className:"stat"}, "Carpeta de ", h("span",{className:"statv"}, "@" + USERNAME))
+      ),
+
+      h("div", {className:"grid"},
+        filtered.length === 0
+          ? h("div", {className:"empty"},
+              h("div",{className:"eicon"},"◈"),
+              h("div",{className:"etitle"}, collection.length===0 ? "Carpeta vacía" : "Sin resultados"),
+              h("div",{className:"esub"}, collection.length===0
+                ? (viewMode==="owner" ? "Agrega cartas con el botón de arriba" : "Este usuario no tiene cartas")
+                : `Sin coincidencias para "${filterQ}"`)
+            )
+          : filtered.map(card =>
+              h("div", {key:card.uid, className:"tile"},
+                h("div", {className:"imgwrap"},
+                  h(CardImg, {url:card.imageUrl, name:card.name, set:card.setCode}),
+                  viewMode==="owner" && h("div", {className:"overlay"},
+                    h("button", {className:"abtn ebtn", onClick:()=>openEdit(card)}, "✎ Editar"),
+                    h("button", {className:"abtn dbtn", onClick:()=>removeCard(card.uid)}, "✕ Quitar")
+                  )
+                ),
+                h("div", {className:"cinfo"},
+                  h("div", {className:"cname"}, card.name),
+                  h("div", {style:{display:"flex",alignItems:"center",gap:".3rem",flexWrap:"wrap"}},
+                    h("span", {className:"pbadge"}, "$ " + card.price),
+                    h("span", {className:"setbadge"}, card.setCode)
+                  )
+                )
+              )
+            )
+      )
+    ),
+
+    // ADD MODAL
+    showAdd && h("div", {className:"backdrop", onClick:e=>{if(e.target===e.currentTarget){setShowAdd(false);setSelected(null);setCardQ("");setPrice("");setAcList([]);}}},
+      h("div", {className:"modal"},
+        h("div", {className:"mtitle"}, "✦ Agregar Carta"),
+        h("div", {className:"fgroup"},
+          h("label", {className:"flabel"}, "Buscar carta"),
+          h("div", {className:"acwrap", ref:acRef},
+            h("input", {className:"finput", placeholder:"Ej: Vader, Luke, Anakin, Ahsoka...", value:cardQ, onChange:e=>handleCardQ(e.target.value), autoFocus:true}),
+            cardQ.length >= 2 && h("div", {className:"aclist"},
+              acList.length === 0
+                ? h("div", {className:"acstatus"}, `Sin resultados para "${cardQ}"`)
+                : acList.map((c,i) =>
+                    h("div", {key:i, className:"acitem", onClick:()=>selectCard(c)},
+                      h(AcThumb, {url:c.imageUrl, name:c.name, set:c.s}),
+                      h("div", {style:{flex:1,minWidth:0}},
+                        h("div", {className:"acname"}, c.displayName),
+                        h("div", {className:"acsub"}, c.setName + " · " + c.t)
+                      )
+                    )
+                  )
+            )
+          )
+        ),
+        selected && h("div", {className:"selpreview"},
+          h("div", {className:"selthumb"}, h(AcThumb, {url:selected.imageUrl, name:selected.name, set:selected.s})),
+          h("div", null,
+            h("div", {className:"selname"}, selected.displayName),
+            h("div", {className:"selsub"}, selected.setName + " · " + selected.t),
+            h("div", {className:"selid"}, "ID: " + selected.id)
+          )
+        ),
+        h("div", {className:"fgroup"},
+          h("label", {className:"flabel"}, "Precio"),
+          h("div", {className:"piwrap"},
+            h("span", {className:"pisym"}, "$"),
+            h("input", {className:"finput", type:"number", placeholder:"0.00", min:"0", step:"0.01", value:price, onChange:e=>setPrice(e.target.value), disabled:!selected, style:{paddingLeft:"1.8rem"}})
+          )
+        ),
+        h("div", {className:"mactions"},
+          h("button", {className:"bcancl", onClick:()=>{setShowAdd(false);setSelected(null);setCardQ("");setPrice("");setAcList([]);}}, "Cancelar"),
+          h("button", {className:"bconf", onClick:addCard, disabled:!selected||!price}, "Agregar a carpeta")
+        )
+      )
+    ),
+
+    // EDIT MODAL
+    editCard && h("div", {className:"backdrop", onClick:e=>{if(e.target===e.currentTarget)setEditCard(null)}},
+      h("div", {className:"modal"},
+        h("div", {className:"mtitle"}, "✎ Editar Precio"),
+        h("div", {className:"selpreview"},
+          h("div", {className:"selthumb"}, h(AcThumb, {url:editCard.imageUrl, name:editCard.name, set:editCard.setCode})),
+          h("div", null,
+            h("div", {className:"selname"}, editCard.name),
+            h("div", {className:"selid"}, "ID: " + editCard.card_id)
+          )
+        ),
+        h("div", {className:"fgroup"},
+          h("label", {className:"flabel"}, "Nuevo precio"),
+          h("div", {className:"piwrap"},
+            h("span", {className:"pisym"}, "$"),
+            h("input", {className:"finput", type:"number", placeholder:"0.00", min:"0", step:"0.01", value:editPrice, onChange:e=>setEditPrice(e.target.value), autoFocus:true, style:{paddingLeft:"1.8rem"}})
+          )
+        ),
+        h("div", {className:"mactions"},
+          h("button", {className:"bcancl", onClick:()=>setEditCard(null)}, "Cancelar"),
+          h("button", {className:"bconf", onClick:saveEdit, disabled:!editPrice}, "Guardar")
+        )
+      )
+    ),
+
+    // SHARE MODAL
+    showShare && h("div", {className:"backdrop", onClick:e=>{if(e.target===e.currentTarget)setShowShare(false)}},
+      h("div", {className:"modal"},
+        h("div", {className:"mtitle"}, "⟁ Compartir Carpeta"),
+        h("p", {style:{fontSize:".9rem",color:"#4d7a9a",marginBottom:".5rem"}}, "Cualquier persona con este enlace podrá ver tu carpeta."),
+        h("div", {className:"slinkbox"},
+          h("span", {className:"slinktext"}, shareLink),
+          h("button", {className:"copybtn" + (copied?" cp":""), onClick:copyLink}, copied ? "✓ Copiado" : "Copiar")
+        ),
+        h("p", {className:"snote"}, "Los visitantes solo podrán ", h("strong",{style:{color:"#7aa8c4"}},"ver y buscar"), " cartas."),
+        h("div", {className:"mactions"}, h("button", {className:"bconf", onClick:()=>setShowShare(false)}, "Listo"))
+      )
+    ),
+
+    toast && h("div", {className:"toast", key:toast}, toast)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
