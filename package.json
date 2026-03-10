@@ -1,0 +1,185 @@
+import { useState, useEffect } from "react";
+import { CardImage } from "./components/CardImage.jsx";
+import { AddCardModal }   from "./components/AddCardModal.jsx";
+import { EditPriceModal } from "./components/EditPriceModal.jsx";
+import { ShareModal }     from "./components/ShareModal.jsx";
+
+// ─── Config ─────────────────────────────────────────────────────────────────
+const USERNAME   = "darthtrader";
+const SHARE_BASE = "korex.ar/u/";
+const STORAGE_KEY = "korex_collection";
+
+// ─── App ─────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [viewMode,   setViewMode]   = useState("owner");
+  const [collection, setCollection] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+    catch { return []; }
+  });
+  const [filterQ,    setFilterQ]    = useState("");
+  const [showAdd,    setShowAdd]    = useState(false);
+  const [showShare,  setShowShare]  = useState(false);
+  const [editCard,   setEditCard]   = useState(null);
+  const [toast,      setToast]      = useState(null);
+
+  // Persist collection to localStorage
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collection)); }
+    catch {}
+  }, [collection]);
+
+  // ── Toast helper ──────────────────────────────────────────────────────────
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3100);
+  };
+
+  // ── Collection actions ────────────────────────────────────────────────────
+  const handleAdd = (entry) => {
+    setCollection((prev) => [entry, ...prev]);
+    setShowAdd(false);
+    showToast("✦ Carta agregada");
+  };
+
+  const handleRemove = (uid) => {
+    setCollection((prev) => prev.filter((c) => c.uid !== uid));
+    showToast("Carta eliminada");
+  };
+
+  const handleSaveEdit = (uid, newPrice) => {
+    setCollection((prev) =>
+      prev.map((c) => (c.uid === uid ? { ...c, price: newPrice } : c))
+    );
+    setEditCard(null);
+    showToast("Precio actualizado");
+  };
+
+  // ── Derived values ────────────────────────────────────────────────────────
+  const filtered    = collection.filter((c) =>
+    c.name.toLowerCase().includes(filterQ.toLowerCase())
+  );
+  const totalValue  = collection.reduce((s, c) => s + parseFloat(c.price || 0), 0);
+  const shareLink   = `${SHARE_BASE}${USERNAME}`;
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  return (
+    <div className="root">
+      {/* Decorative */}
+      <div className="scanline" />
+      <div className="corner-tl" />
+      <div className="corner-tr" />
+
+      {/* ── Header ── */}
+      <header className="header">
+        <div className="logo">KOR<span>EX</span></div>
+
+        <div className="header-right">
+          {viewMode === "viewer" ? (
+            <>
+              <div className="viewer-badge">
+                <div className="dot" /> Vista pública
+              </div>
+              <button
+                className="add-btn"
+                style={{ fontSize: ".8rem", padding: ".35rem .9rem" }}
+                onClick={() => setViewMode("owner")}
+              >
+                ← Volver
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="user-badge">⬡ {USERNAME}</span>
+              <button className="share-btn" onClick={() => setShowShare(true)}>
+                ⟁ Compartir Carpeta
+              </button>
+              <button
+                className="viewer-badge"
+                style={{ cursor: "pointer", background: "none" }}
+                onClick={() => setViewMode("viewer")}
+              >
+                👁 Vista pública
+              </button>
+            </>
+          )}
+        </div>
+      </header>
+
+      {/* ── Main ── */}
+      <main className="main">
+        {/* Search + Add button */}
+        <div className="topbar">
+          <div className="search-wrap">
+            <span className="search-icon">⌕</span>
+            <input
+              className="search-input"
+              placeholder="Buscar en mi carpeta..."
+              value={filterQ}
+              onChange={(e) => setFilterQ(e.target.value)}
+            />
+          </div>
+          {viewMode === "owner" && (
+            <button className="add-btn" onClick={() => setShowAdd(true)}>
+              + Agregar Carta
+            </button>
+          )}
+        </div>
+
+        {/* Stats bar */}
+        <div className="stats-bar">
+          <div className="stat">Cartas  <span className="stat-value">{collection.length}</span></div>
+          <div className="stat">Valor total <span className="stat-value">${totalValue.toFixed(2)}</span></div>
+          <div className="stat">Carpeta de  <span className="stat-value">@{USERNAME}</span></div>
+        </div>
+
+        {/* Card grid */}
+        <div className="grid">
+          {filtered.length === 0 ? (
+            <div className="empty">
+              <div className="empty-icon">◈</div>
+              <div className="empty-title">
+                {collection.length === 0 ? "Carpeta vacía" : "Sin resultados"}
+              </div>
+              <div className="empty-sub">
+                {collection.length === 0
+                  ? viewMode === "owner"
+                    ? "Agrega cartas con el botón de arriba"
+                    : "Este usuario no tiene cartas"
+                  : `Sin coincidencias para "${filterQ}"`}
+              </div>
+            </div>
+          ) : (
+            filtered.map((card) => (
+              <div key={card.uid} className="tile">
+                <div className="img-wrap">
+                  <CardImage url={card.imageUrl} name={card.name} set={card.setCode} />
+                  {viewMode === "owner" && (
+                    <div className="overlay">
+                      <button className="action-btn edit-btn"   onClick={() => setEditCard(card)}>✎ Editar</button>
+                      <button className="action-btn delete-btn" onClick={() => handleRemove(card.uid)}>✕ Quitar</button>
+                    </div>
+                  )}
+                </div>
+                <div className="card-info">
+                  <div className="card-name">{card.name}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: ".3rem", flexWrap: "wrap" }}>
+                    <span className="price-badge">$ {card.price}</span>
+                    <span className="set-badge">{card.setCode}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </main>
+
+      {/* ── Modals ── */}
+      {showAdd   && <AddCardModal   onAdd={handleAdd} onClose={() => setShowAdd(false)} />}
+      {editCard  && <EditPriceModal card={editCard}   onSave={handleSaveEdit} onClose={() => setEditCard(null)} />}
+      {showShare && <ShareModal     shareLink={shareLink} onClose={() => setShowShare(false)} />}
+
+      {/* ── Toast ── */}
+      {toast && <div className="toast" key={toast}>{toast}</div>}
+    </div>
+  );
+}

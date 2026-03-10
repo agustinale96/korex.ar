@@ -1,0 +1,45 @@
+import { useState } from "react";
+
+export function ShareModal({ shareLink, onClose }) {
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard?.writeText("https://" + shareLink).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div
+      className="backdrop"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="modal">
+        <div className="modal-title">⟁ Compartir Carpeta</div>
+
+        <p style={{ fontSize: ".9rem", color: "#4d7a9a", marginBottom: ".5rem" }}>
+          Cualquier persona con este enlace podrá ver tu carpeta.
+        </p>
+
+        <div className="share-link-box">
+          <span className="share-link-text">{shareLink}</span>
+          <button
+            className={`copy-btn${copied ? " copied" : ""}`}
+            onClick={copyLink}
+          >
+            {copied ? "✓ Copiado" : "Copiar"}
+          </button>
+        </div>
+
+        <p className="share-note">
+          Los visitantes solo podrán{" "}
+          <strong style={{ color: "#7aa8c4" }}>ver y buscar</strong> cartas.
+        </p>
+
+        <div className="modal-actions">
+          <button className="btn-confirm" onClick={onClose}>Listo</button>
+        </div>
+      </div>
+    </div>
+  );
+}

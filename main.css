@@ -1,0 +1,60 @@
+import { useState } from "react";
+import { AcThumb } from "./CardImage.jsx";
+
+export function EditPriceModal({ card, onSave, onClose }) {
+  const [price, setPrice] = useState(card.price);
+
+  const handleSave = () => {
+    if (!price) return;
+    onSave(card.uid, parseFloat(price).toFixed(2));
+  };
+
+  return (
+    <div
+      className="backdrop"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="modal">
+        <div className="modal-title">✎ Editar Precio</div>
+
+        <div className="sel-preview">
+          <div className="sel-thumb">
+            <AcThumb url={card.imageUrl} name={card.name} set={card.setCode} />
+          </div>
+          <div>
+            <div className="sel-name">{card.name}</div>
+            <div className="sel-id">ID: {card.card_id}</div>
+          </div>
+        </div>
+
+        <div className="field-group">
+          <label className="field-label">Nuevo precio</label>
+          <div className="price-wrap">
+            <span className="price-symbol">$</span>
+            <input
+              className="field-input"
+              type="number"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              autoFocus
+            />
+          </div>
+        </div>
+
+        <div className="modal-actions">
+          <button className="btn-cancel"  onClick={onClose}>Cancelar</button>
+          <button
+            className="btn-confirm"
+            onClick={handleSave}
+            disabled={!price}
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
